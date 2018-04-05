@@ -23,7 +23,6 @@ public class Game {
 
     private Player player;
     private Boss boss;
-    private UI ui;
 
     private boolean gameOver;
 
@@ -41,8 +40,6 @@ public class Game {
         addObj(player);
         addObj(boss);
 
-        ui = new UI(100);
-
         gameOver = false;
     }
 
@@ -53,9 +50,6 @@ public class Game {
                     object.update();
                 else
                     toRemove.add(object);
-            }
-            if (ui != null) {
-                ui.update();
             }
 
             if (!toAdd.isEmpty()) {
@@ -75,7 +69,6 @@ public class Game {
 
     public void render() {
         gameObjects.forEach(GameObject::render);
-        if (ui != null) { ui.render(); }
     }
 
     public void addObj(GameObject obj) {
@@ -101,12 +94,7 @@ public class Game {
         float p1 = object.getX() - (object.getWidth()/2f) - range;
         float p2 = object.getY() - (object.getHeight()/2f) - range;
         Rectangle field = new Rectangle((int)p1, (int)p2, (int)(object.getWidth() + 2 * range), (int)(object.getHeight() + 2 * range));
-//        glBegin(GL11.GL_QUADS);
-//            glVertex2f(field.x, field.y);
-//            glVertex2f(field.x + field.width, field.y);
-//            glVertex2f(field.x + field.width, field.y + field.height);
-//            glVertex2f(field.x, field.y + field.height);
-//        glEnd();
+
         for(GameObject o : gameObjects)
         {
             if(!o.equals(object) && Physics.checkCollision(field, o))
