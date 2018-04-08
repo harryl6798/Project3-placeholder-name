@@ -8,7 +8,15 @@ import com.base.game.interfaces.UI;
 import com.base.game.levels.Level;
 import com.base.game.levels.LevelTransition;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +27,23 @@ public class Game {
     private int currLevel;
 
     public Game() {
+        //TEST AUDIO
+        try {
+            Clip bSound = AudioSystem.getClip();
+            File audio = new File("./res/audio/Fighting_is_not_an_option.wav");
+            bSound.open(AudioSystem.getAudioInputStream(audio.toURI().toURL()));
+            bSound.start();
+            bSound.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        }
+
         currLevel = 0;
         levels = new ArrayList();
 

@@ -6,7 +6,13 @@ import com.base.game.gameobject.object.Door;
 import com.base.game.gameobject.projectile.StandardProjectile;
 import com.base.game.utilities.Delay;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -14,6 +20,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Player extends Character {
     private Delay attackDelay; // Delay between attacks
+    private Animation walk;
+    private Clip fire;
 
     /**
      * Creates a player object (should only be done once)
@@ -29,8 +37,30 @@ public class Player extends Character {
     public Player(float xPos, float yPos, int width, int height, String imgPath, float speed, int health, int attackDamage) {
         super(xPos, yPos, width, height, imgPath, speed, health, attackDamage); // Call Character superclass's constructor
 
+        walk = new Animation("player", 5);
+
+        try {
+            fire = AudioSystem.getClip();
+            File audio = new File("./res/audio/flaunch.wav");
+            fire.open(AudioSystem.getAudioInputStream(audio.toURI().toURL()));
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        }
+
+
         attackDelay = new Delay(500); // Time (in milliseconds) between attacks
         attackDelay.restart(); // Run this method so we can immediately fire
+    }
+
+    @Override
+    public void render() {
+        walk.render(xPos, yPos);
     }
 
     /**
@@ -47,6 +77,16 @@ public class Player extends Character {
      * Gets input from the InputHandler
      */
     public void getInput() {
+        if (InputHandler.isKeyDown(GLFW_KEY_W) || InputHandler.isKeyDown(GLFW_KEY_A) || InputHandler.isKeyDown(GLFW_KEY_S) || InputHandler.isKeyDown(GLFW_KEY_D)) {
+            if (walk.isStopped()) {
+                walk.restart();
+            }
+
+            walk.start();
+        } else {
+            walk.stop();
+        }
+
         // Go up
         if (InputHandler.isKeyDown(GLFW_KEY_W) && yPos < Display.getHeight() - height) {
             yPos += speed;
@@ -69,6 +109,9 @@ public class Player extends Character {
 
         // Shoot
         if(InputHandler.isKeyDown(GLFW_KEY_SPACE) && attackDelay.isOver()) {
+            fire.stop();
+            fire.setFramePosition(0);
+            fire.start();
             attack();
         }
     }
